@@ -8,6 +8,8 @@ Questo repository contiene i materiali per l'esercitazione pratica di analisi me
 
 | Sample ID | Gruppo | File R1 | File R2 |
 |---|---|---|---|
+| H77 | CTRL | `NG-A1943_V3V4a_H77_240117a_libLAF6017_1.fastq.gz` | `NG-A1943_V3V4a_H77_240117a_libLAF6017_2.fastq.gz` |
+| H78 | TRT  | `NG-A1943_V3V4a_H78_240117a_libLAF6018_1.fastq.gz` | `NG-A1943_V3V4a_H78_240117a_libLAF6018_2.fastq.gz` |
 | H79 | CTRL | `NG-A1943_V3V4a_H79_240117a_libLAF6019_1.fastq.gz` | `NG-A1943_V3V4a_H79_240117a_libLAF6019_2.fastq.gz` |
 | H81 | TRT  | `NG-A1943_V3V4a_H81_240117a_libLAF6015_1.fastq.gz` | `NG-A1943_V3V4a_H81_240117a_libLAF6015_2.fastq.gz` |
 
@@ -71,6 +73,10 @@ docker run -it --rm \
 ├── manifest/
 │   └── manifest.tsv          # Manifest paired-end per l'import in QIIME2
 ├── metadata.txt              # Metadati: sample-id e gruppo (CTRL / TRT)
+├── NG-A1943_V3V4a_H77_240117a_libLAF6017_1.fastq.gz   # CTRL — R1
+├── NG-A1943_V3V4a_H77_240117a_libLAF6017_2.fastq.gz   # CTRL — R2
+├── NG-A1943_V3V4a_H78_240117a_libLAF6018_1.fastq.gz   # TRT  — R1
+├── NG-A1943_V3V4a_H78_240117a_libLAF6018_2.fastq.gz   # TRT  — R2
 ├── NG-A1943_V3V4a_H79_240117a_libLAF6019_1.fastq.gz   # CTRL — R1
 ├── NG-A1943_V3V4a_H79_240117a_libLAF6019_2.fastq.gz   # CTRL — R2
 ├── NG-A1943_V3V4a_H81_240117a_libLAF6015_1.fastq.gz   # TRT  — R1
@@ -309,7 +315,7 @@ for METRIC in evenness shannon observed_features; do
 done
 ```
 
-> Test di Kruskal-Wallis: confronta la distribuzione di ciascuna metrica alfa tra i gruppi. Con solo 2 campioni il test non raggiunge potenza statistica, ma il workflow è lo stesso su dataset più ampi.
+> Test di Kruskal-Wallis: confronta la distribuzione di ciascuna metrica alfa tra i gruppi CTRL e TRT.
 
 ### 4d. Significatività statistica — beta diversità
 
