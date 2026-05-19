@@ -342,6 +342,8 @@ ANCOM-BC identifica i taxa statisticamente differenziati tra il gruppo **TRT** e
 
 ```bash
 for LEVEL in 2 5 6; do
+  mkdir -p classification/level${LEVEL}/DA
+
   qiime composition ancombc \
     --i-table classification/level${LEVEL}/collapsed_table.qza \
     --m-metadata-file metadata.txt \

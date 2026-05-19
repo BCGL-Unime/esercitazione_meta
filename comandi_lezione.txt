@@ -114,6 +114,8 @@ qiime diversity beta-group-significance --i-distance-matrix diversity/core-metri
 # NOTA: modificare --p-formula e --p-reference-levels in base al proprio disegno sperimentale
 # ------------------------------------------------------------
 
+mkdir -p classification/level2/DA classification/level5/DA classification/level6/DA
+
 qiime composition ancombc --i-table classification/level2/collapsed_table.qza --m-metadata-file metadata.txt --p-formula 'exp_group_time' --p-reference-levels exp_group_time::baseline_T0 --o-differentials classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qza
 
 qiime composition da-barplot --i-data classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qza --p-significance-threshold 0.05 --p-level-delimiter ';' --o-visualization classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qzv
