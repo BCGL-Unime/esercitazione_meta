@@ -35,7 +35,15 @@ cd esercitazione_meta
 > Se non hai Git installato, puoi scaricare il repository come archivio ZIP dalla pagina GitHub:
 > **Code → Download ZIP**, poi estrai la cartella e aprila nel terminale.
 
-### 0b. Scarica l'immagine Docker
+### 0b. Scarica il classificatore SILVA
+
+Il classificatore (208 MB) non è incluso nel repository. Scaricalo dalla pagina **Releases**:
+
+**[Download silva-138-99-nb-classifier.qza](https://github.com/BCGL-Unime/esercitazione_meta/releases/download/v1.0/silva-138-99-nb-classifier.qza)**
+
+Metti il file scaricato **nella stessa cartella** del repository (accanto ai file `.fastq.gz`).
+
+### 0c. Scarica l'immagine Docker
 
 Tutta la pipeline è preconfigurata in un'immagine Docker. Scaricala con:
 
