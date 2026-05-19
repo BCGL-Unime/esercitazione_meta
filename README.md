@@ -40,7 +40,7 @@ cd esercitazione_meta
 Tutta la pipeline è preconfigurata in un'immagine Docker. Scaricala con:
 
 ```bash
-docker pull anbonomo/esercitazione_meta
+docker pull anbonomo/esercitazione_qiime2
 ```
 
 Avvia il container montando la cartella di lavoro corrente:
@@ -49,7 +49,7 @@ Avvia il container montando la cartella di lavoro corrente:
 docker run -it --rm \
   -v $(pwd):/data \
   -w /data \
-  anbonomo/esercitazione_meta bash
+  anbonomo/esercitazione_qiime2 bash
 ```
 
 > Tutti i comandi seguenti vanno eseguiti **all'interno del container**.
