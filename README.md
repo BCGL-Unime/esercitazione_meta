@@ -152,7 +152,7 @@ mkdir -p classification
 
 qiime feature-classifier classify-sklearn \
   --i-reads rep-seqs.qza \
-  --i-classifier /mnt/hdd2/database/qiime_pretrained_2024-5/silva-138-99-nb-classifier.qza \
+  --i-classifier silva-138-99-nb-classifier.qza \
   --o-classification classification/taxonomy_denoised.qza \
   --p-n-jobs 30
 ```
