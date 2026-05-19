@@ -239,6 +239,29 @@ done
 
 ## Step 4 — Diversità alfa e beta
 
+La **diversità alfa** descrive la ricchezza e l'equità della comunità microbica *dentro* un singolo campione. La **diversità beta** misura la dissimilarità nella composizione *tra* campioni diversi. Sono complementari: alfa risponde a "quanto è ricca questa comunità?", beta risponde a "quanto sono diverse queste comunità tra loro?".
+
+### Metriche alfa
+
+| Metrica | Cosa misura |
+|---|---|
+| **observed_features** | Numero di ASV distinti presenti nel campione. Misura pura di ricchezza: non considera le abbondanze, ogni ASV conta uguale indipendentemente da quante read la rappresentano. |
+| **shannon** | Indice di Shannon-Wiener: combina ricchezza ed equità. Alta ricchezza con distribuzione uniforme delle abbondanze = valore alto. Se poche specie dominano e le altre sono rare, il valore scende. Matematicamente è l'entropia della distribuzione: `H = −Σ pᵢ · ln(pᵢ)`. |
+| **evenness** (Pielou's J) | Misura solo l'equità, normalizzando Shannon rispetto al massimo teorico: `J = H / ln(S)`. Valore tra 0 e 1 — vicino a 1 = tutte le specie ugualmente abbondanti; vicino a 0 = poche specie dominano. Utile per separare l'effetto della ricchezza da quello della dominanza. |
+
+### Metriche beta
+
+Le metriche beta producono una **matrice di distanze** tra campioni, visualizzata tramite PCoA (Principal Coordinates Analysis). Campioni simili appaiono vicini nel grafico.
+
+| Metrica | Cosa misura |
+|---|---|
+| **bray_curtis** | Dissimilarità basata sulle abbondanze relative: `BC = Σ\|aᵢ − bᵢ\| / Σ(aᵢ + bᵢ)`. Valore tra 0 (campioni identici) e 1 (nessuna specie in comune). Sensibile alle specie dominanti: se cambiano le loro abbondanze, la distanza varia molto. |
+| **jaccard** | Basato solo su presenza/assenza: `J = 1 − (\|A∩B\| / \|A∪B\|)`. Ignora le abbondanze — una specie con 1 read conta come una con 10.000. Più sensibile alle specie rare rispetto a Bray-Curtis. |
+
+> **Bray-Curtis vs Jaccard:** concordano spesso, ma divergono quando cambiano le abbondanze senza cambiare le specie presenti (solo Bray-Curtis lo rileva) o quando i campioni condividono le stesse specie dominanti ma differiscono nelle rare (solo Jaccard lo rileva).
+
+---
+
 Usiamo `qiime diversity core-metrics` (versione non-filogenetica), che non richiede un albero evolutivo ed è sufficiente per le metriche composizionali standard.
 
 ### 4a. Metriche core (alfa + beta)
