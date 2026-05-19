@@ -15,12 +15,27 @@ Questo repository contiene i materiali per l'esercitazione pratica di analisi me
 
 ## Requisiti
 
+- [Git](https://git-scm.com/downloads) installato
 - [Docker](https://docs.docker.com/get-docker/) installato e funzionante
 - ~10 GB di spazio su disco
 
 ---
 
-## 0. Setup: Scarica l'immagine Docker
+## 0. Setup iniziale
+
+### 0a. Scarica il repository
+
+Clona il repository con tutti i file necessari (dati, manifest, metadata):
+
+```bash
+git clone https://github.com/BCGL-Unime/esercitazione_meta.git
+cd esercitazione_meta
+```
+
+> Se non hai Git installato, puoi scaricare il repository come archivio ZIP dalla pagina GitHub:
+> **Code → Download ZIP**, poi estrai la cartella e aprila nel terminale.
+
+### 0b. Scarica l'immagine Docker
 
 Tutta la pipeline è preconfigurata in un'immagine Docker. Scaricala con:
 
