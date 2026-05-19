@@ -1,0 +1,3 @@
+sample-id	forward-absolute-filepath	reverse-absolute-filepath
+H79	$PWD/NG-A1943_V3V4a_H79_240117a_libLAF6019_1.fastq.gz	$PWD/NG-A1943_V3V4a_H79_240117a_libLAF6019_2.fastq.gz
+H81	$PWD/NG-A1943_V3V4a_H81_240117a_libLAF6015_1.fastq.gz	$PWD/NG-A1943_V3V4a_H81_240117a_libLAF6015_2.fastq.gz

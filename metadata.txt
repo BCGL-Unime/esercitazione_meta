@@ -1,0 +1,4 @@
+sample-id	group
+#q2:types	categorical
+H79	CTRL
+H81	TRT

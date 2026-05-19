@@ -1,0 +1,95 @@
+# ============================================================
+# ANALISI METAGENOMICA - PIPELINE QIIME2
+# ============================================================
+
+
+# ------------------------------------------------------------
+# STEP 1 - IMPORT DEI DATI
+# Input:  manifest.tsv
+# Output: import.qza, summary_import.qzv
+# ------------------------------------------------------------
+
+qiime tools import --type 'SampleData[SequencesWithQuality]' --input-path manifest/manifest.tsv --output-path import.qza --input-format SingleEndFastqManifestPhred33V2
+
+qiime demux summarize --i-data import.qza --o-visualization summary_import.qzv
+
+
+# ------------------------------------------------------------
+# STEP 2 - DENOISING CON DADA2
+# Input:  import.qza
+# Output: table.qza, rep-seqs.qza, denoising-stats.qza, table.qzv, denoising-stats.qzv
+# NOTA: modificare --p-trunc-len-f e --p-trunc-len-r in base a summary_import.qzv
+# ------------------------------------------------------------
+
+qiime dada2 denoise-single --i-demultiplexed-seqs import.qza --p-n-threads 0 --p-trim-left-f 0 --p-trim-left-r 0 --p-trunc-q 2 --p-trunc-len 248 --p-min-fold-parent-over-abundance 4 --o-table table.qza --o-representative-sequences rep-seqs.qza --o-denoising-stats denoising-stats.qza
+
+qiime feature-table summarize --i-table table.qza --o-visualization table.qzv --m-sample-metadata-file metadata.txt
+
+qiime metadata tabulate --m-input-file denoising-stats.qza --o-visualization denoising-stats.qzv
+
+
+# ------------------------------------------------------------
+# STEP 3 - CLASSIFICAZIONE TASSONOMICA E FILTRAGGIO
+# Input:  rep-seqs.qza, table.qza
+# Output: classification/taxonomy_denoised.qza, table-no-eukaryota-no-unassigned.qza, varie visualizzazioni
+# ------------------------------------------------------------
+
+qiime feature-classifier classify-sklearn --i-reads rep-seqs.qza --i-classifier /mnt/hdd2/database/qiime_pretrained_2024-5/silva-138-99-nb-classifier.qza --o-classification classification/taxonomy_denoised.qza --p-n-jobs 30
+
+qiime taxa filter-table --i-table table.qza --i-taxonomy classification/taxonomy_denoised.qza --p-exclude eukaryota,unassigned --o-filtered-table table-no-eukaryota-no-unassigned.qza
+
+qiime feature-table summarize --i-table table-no-eukaryota-no-unassigned.qza --o-visualization table-no-eukaryota-no-unassigned.qzv --m-sample-metadata-file metadata.txt
+
+qiime feature-table tabulate-seqs --i-data rep-seqs.qza --i-taxonomy classification/taxonomy_denoised.qza --o-visualization rep-seqs.qzv
+
+qiime metadata tabulate --m-input-file classification/taxonomy_denoised.qza --o-visualization classification/taxonomy_denoised_metadata.qzv
+
+qiime taxa barplot --i-table table-no-eukaryota-no-unassigned.qza --i-taxonomy classification/taxonomy_denoised.qza --m-metadata-file metadata.txt --output-dir classification/otu_final --o-visualization classification/taxa-bar-plots.qzv
+
+
+# --- Collasso per livello tassonomico e frequenze relative ---
+
+qiime taxa collapse --i-table table-no-eukaryota-no-unassigned.qza --i-taxonomy classification/taxonomy_denoised.qza --p-level 2 --output-dir classification/level2
+
+qiime feature-table relative-frequency --i-table classification/level2/collapsed_table.qza --o-relative-frequency-table classification/level2/level2_relative.qza
+
+qiime metadata tabulate --m-input-file classification/level2/level2_relative.qza --o-visualization classification/level2/level2_relative_tabulated.qzv
+
+qiime taxa collapse --i-table table-no-eukaryota-no-unassigned.qza --i-taxonomy classification/taxonomy_denoised.qza --p-level 5 --output-dir classification/level5
+
+qiime feature-table relative-frequency --i-table classification/level5/collapsed_table.qza --o-relative-frequency-table classification/level5/level5_relative.qza
+
+qiime metadata tabulate --m-input-file classification/level5/level5_relative.qza --o-visualization classification/level5/level5_relative_tabulated.qzv
+
+qiime taxa collapse --i-table table-no-eukaryota-no-unassigned.qza --i-taxonomy classification/taxonomy_denoised.qza --p-level 6 --output-dir classification/level6
+
+qiime feature-table relative-frequency --i-table classification/level6/collapsed_table.qza --o-relative-frequency-table classification/level6/level6_relative.qza
+
+qiime metadata tabulate --m-input-file classification/level6/level6_relative.qza --o-visualization classification/level6/level6_relative_tabulated.qzv
+
+
+# --- Esportazione in formato TSV ---
+
+qiime tools export --input-path classification/level2/collapsed_table.qza --output-path classification/level2/
+
+biom convert -i classification/level2/feature-table.biom -o classification/level2/level2.tsv --to-tsv
+
+qiime tools export --input-path classification/level5/collapsed_table.qza --output-path classification/level5/
+
+biom convert -i classification/level5/feature-table.biom -o classification/level5/level5.tsv --to-tsv
+
+qiime tools export --input-path classification/level6/collapsed_table.qza --output-path classification/level6/
+
+biom convert -i classification/level6/feature-table.biom -o classification/level6/level6.tsv --to-tsv
+
+
+# ------------------------------------------------------------
+# STEP 4 - ANALISI DIFFERENZIALE (ANCOM-BC)
+# Input:  classification/levelX/collapsed_table.qza, metadata.txt
+# Output: classification/levelX/DA/..._differentials.qza / .qzv
+# NOTA: modificare --p-formula e --p-reference-levels in base al proprio disegno sperimentale
+# ------------------------------------------------------------
+
+qiime composition ancombc --i-table classification/level2/collapsed_table.qza --m-metadata-file metadata.txt --p-formula 'exp_group_time' --p-reference-levels exp_group_time::baseline_T0 --o-differentials classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qza
+
+qiime composition da-barplot --i-data classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qza --p-significance-threshold 0.05 --p-level-delimiter ';' --o-visualization classification/level2/DA/exp_group_time_baseline_T0_ref_differentials.qzv
