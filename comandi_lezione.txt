@@ -34,7 +34,7 @@ qiime metadata tabulate --m-input-file denoising-stats.qza --o-visualization den
 # Output: classification/taxonomy_denoised.qza, table-no-eukaryota-no-unassigned.qza, varie visualizzazioni
 # ------------------------------------------------------------
 
-qiime feature-classifier classify-sklearn --i-reads rep-seqs.qza --i-classifier /mnt/hdd2/database/qiime_pretrained_2024-5/silva-138-99-nb-classifier.qza --o-classification classification/taxonomy_denoised.qza --p-n-jobs 30
+qiime feature-classifier classify-sklearn --i-reads rep-seqs.qza --i-classifier silva-138-99-nb-classifier.qza --o-classification classification/taxonomy_denoised.qza --p-n-jobs 30
 
 qiime taxa filter-table --i-table table.qza --i-taxonomy classification/taxonomy_denoised.qza --p-exclude eukaryota,unassigned --o-filtered-table table-no-eukaryota-no-unassigned.qza
 
