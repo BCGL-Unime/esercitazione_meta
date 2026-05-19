@@ -206,8 +206,6 @@ I livelli SILVA corrispondono a: 1=Domain, 2=Phylum, 5=Family, 6=Genus.
 
 ```bash
 for LEVEL in 2 5 6; do
-  mkdir -p classification/level${LEVEL}/DA
-
   qiime taxa collapse \
     --i-table table-no-eukaryota-no-unassigned.qza \
     --i-taxonomy classification/taxonomy_denoised.qza \
