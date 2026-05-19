@@ -54,6 +54,10 @@ docker run -it --rm \
 └── NG-A1943_V3V4a_H81_240117a_libLAF6015_2.fastq.gz   # TRT  — R2
 ```
 
+Gli output generati dalla pipeline vengono salvati nelle cartelle:
+- `classification/` — tassonomia, tabelle collassate, analisi differenziale
+- `diversity/` — albero filogenetico, metriche alfa/beta, PCoA plots
+
 ---
 
 ## Step 1 — Import dei dati paired-end
@@ -210,7 +214,79 @@ done
 
 ---
 
-## Step 4 — Analisi differenziale (ANCOM-BC)
+## Step 4 — Diversità alfa e beta
+
+Usiamo `qiime diversity core-metrics` (versione non-filogenetica), che non richiede un albero evolutivo ed è sufficiente per le metriche composizionali standard.
+
+### 4a. Metriche core (alfa + beta)
+
+Prima di eseguire questo step, verifica il numero minimo di read per campione aprendo `table-no-eukaryota-no-unassigned.qzv` su [view.qiime2.org](https://view.qiime2.org) e sostituisci `INSERISCI_PROFONDITA` con quel valore.
+
+```bash
+mkdir -p diversity
+
+qiime diversity core-metrics \
+  --i-table table-no-eukaryota-no-unassigned.qza \
+  --p-sampling-depth INSERISCI_PROFONDITA \
+  --m-metadata-file metadata.txt \
+  --output-dir diversity/core-metrics
+```
+
+Questo comando calcola in un colpo solo:
+
+| Tipo | Metriche |
+|---|---|
+| **Alfa** | `observed_features`, `shannon`, `evenness` |
+| **Beta** | `bray_curtis`, `jaccard` |
+| **Visualizzazioni** | Emperor PCoA plots per ciascuna metrica beta |
+
+**Output:** tutti i file in `diversity/core-metrics/`
+
+### 4b. Curva di rarefazione
+
+```bash
+qiime diversity alpha-rarefaction \
+  --i-table table-no-eukaryota-no-unassigned.qza \
+  --p-max-depth INSERISCI_PROFONDITA \
+  --m-metadata-file metadata.txt \
+  --o-visualization diversity/alpha-rarefaction.qzv
+```
+
+> La curva di rarefazione mostra se la profondità di sequenziamento è sufficiente a catturare la diversità del campione (plateau = saturazione).
+
+### 4c. Significatività statistica — alfa diversità
+
+```bash
+for METRIC in evenness shannon observed_features; do
+  qiime diversity alpha-group-significance \
+    --i-alpha-diversity diversity/core-metrics/${METRIC}_vector.qza \
+    --m-metadata-file metadata.txt \
+    --o-visualization diversity/core-metrics/${METRIC}-group-significance.qzv
+done
+```
+
+> Test di Kruskal-Wallis: confronta la distribuzione di ciascuna metrica alfa tra i gruppi. Con solo 2 campioni il test non raggiunge potenza statistica, ma il workflow è lo stesso su dataset più ampi.
+
+### 4d. Significatività statistica — beta diversità
+
+```bash
+for METRIC in bray_curtis jaccard; do
+  qiime diversity beta-group-significance \
+    --i-distance-matrix diversity/core-metrics/${METRIC}_distance_matrix.qza \
+    --m-metadata-file metadata.txt \
+    --m-metadata-column group \
+    --p-pairwise \
+    --o-visualization diversity/core-metrics/${METRIC}-group-significance.qzv
+done
+```
+
+> PERMANOVA: testa se la composizione microbica differisce significativamente tra i gruppi. `--p-pairwise` produce confronti per coppia di gruppi.
+
+**Output:** `diversity/core-metrics/*-group-significance.qzv` (apribili su view.qiime2.org)
+
+---
+
+## Step 5 — Analisi differenziale (ANCOM-BC)
 
 ANCOM-BC identifica i taxa statisticamente differenziati tra il gruppo **TRT** e il gruppo di riferimento **CTRL**.
 
@@ -256,3 +332,6 @@ Tutti i file `.qzv` possono essere aperti direttamente su **[view.qiime2.org](ht
 | `classification/taxa-bar-plots.qzv` | Barplot della composizione tassonomica |
 | `classification/levelX/levelX.tsv` | Tabelle collassate per livello tassonomico (TSV) |
 | `classification/levelX/DA/*.qzv` | Risultati ANCOM-BC: taxa differenziali CTRL vs TRT |
+| `diversity/core-metrics/` | Metriche alfa (Shannon, evenness, observed_features) e beta (Bray-Curtis, Jaccard) + Emperor PCoA |
+| `diversity/alpha-rarefaction.qzv` | Curve di rarefazione per la saturazione della diversità |
+| `diversity/core-metrics/*-group-significance.qzv` | Test statistici (Kruskal-Wallis per alfa, PERMANOVA per beta) |

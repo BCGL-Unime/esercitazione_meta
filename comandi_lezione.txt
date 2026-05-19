@@ -84,7 +84,31 @@ biom convert -i classification/level6/feature-table.biom -o classification/level
 
 
 # ------------------------------------------------------------
-# STEP 4 - ANALISI DIFFERENZIALE (ANCOM-BC)
+# STEP 4 - DIVERSITA' ALFA E BETA
+# Input:  table-no-eukaryota-no-unassigned.qza, metadata.txt
+# Output: diversity/core-metrics/, diversity/alpha-rarefaction.qzv
+# NOTA: sostituire INSERISCI_PROFONDITA con il minimo read per campione (da table-no-eukaryota-no-unassigned.qzv)
+# ------------------------------------------------------------
+
+mkdir -p diversity
+
+qiime diversity core-metrics --i-table table-no-eukaryota-no-unassigned.qza --p-sampling-depth INSERISCI_PROFONDITA --m-metadata-file metadata.txt --output-dir diversity/core-metrics
+
+qiime diversity alpha-rarefaction --i-table table-no-eukaryota-no-unassigned.qza --p-max-depth INSERISCI_PROFONDITA --m-metadata-file metadata.txt --o-visualization diversity/alpha-rarefaction.qzv
+
+qiime diversity alpha-group-significance --i-alpha-diversity diversity/core-metrics/evenness_vector.qza --m-metadata-file metadata.txt --o-visualization diversity/core-metrics/evenness-group-significance.qzv
+
+qiime diversity alpha-group-significance --i-alpha-diversity diversity/core-metrics/shannon_vector.qza --m-metadata-file metadata.txt --o-visualization diversity/core-metrics/shannon-group-significance.qzv
+
+qiime diversity alpha-group-significance --i-alpha-diversity diversity/core-metrics/observed_features_vector.qza --m-metadata-file metadata.txt --o-visualization diversity/core-metrics/observed_features-group-significance.qzv
+
+qiime diversity beta-group-significance --i-distance-matrix diversity/core-metrics/bray_curtis_distance_matrix.qza --m-metadata-file metadata.txt --m-metadata-column group --p-pairwise --o-visualization diversity/core-metrics/bray_curtis-group-significance.qzv
+
+qiime diversity beta-group-significance --i-distance-matrix diversity/core-metrics/jaccard_distance_matrix.qza --m-metadata-file metadata.txt --m-metadata-column group --p-pairwise --o-visualization diversity/core-metrics/jaccard-group-significance.qzv
+
+
+# ------------------------------------------------------------
+# STEP 5 - ANALISI DIFFERENZIALE (ANCOM-BC)
 # Input:  classification/levelX/collapsed_table.qza, metadata.txt
 # Output: classification/levelX/DA/..._differentials.qza / .qzv
 # NOTA: modificare --p-formula e --p-reference-levels in base al proprio disegno sperimentale
